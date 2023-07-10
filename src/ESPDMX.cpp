@@ -14,6 +14,7 @@
 #include <Arduino.h>
 
 #include "ESPDMX.h"
+#include <HardwareSerial.h>
 
 
 
@@ -26,32 +27,35 @@
 #define BREAKFORMAT    SERIAL_8N1
 
 bool dmxStarted = false;
-int sendPin = 2;		//dafault on ESP8266
+int sendPin = 4;		//dafault on ESP32
+int receivePin = -1;
 
 //DMX value array and size. Entry 0 will hold startbyte
 uint8_t dmxData[dmxMaxChannel] = {};
 int chanSize;
 
+HardwareSerial DMXSerial(1);
 
 void DMXESPSerial::init() {
-  chanSize = defaultMax;
-
-  Serial1.begin(DMXSPEED);
   pinMode(sendPin, OUTPUT);
+  chanSize = defaultMax;
+  DMXSerial.begin(DMXSPEED, DMXFORMAT, receivePin, sendPin);
   dmxStarted = true;
 }
 
 // Set up the DMX-Protocol
-void DMXESPSerial::init(int chanQuant) {
-
+void DMXESPSerial::init(int chanQuant, int dmxPin) {
+  sendPin = dmxPin;
+  pinMode(sendPin, OUTPUT);
+  Serial.printf("[INFO] DMX SPSerial chanQuant %i, dmxPin %i, sendPin %i\n", chanQuant, dmxPin, sendPin);
   if (chanQuant > dmxMaxChannel || chanQuant <= 0) {
     chanQuant = defaultMax;
   }
 
   chanSize = chanQuant;
-
-  Serial1.begin(DMXSPEED);
-  pinMode(sendPin, OUTPUT);
+  
+  DMXSerial.begin(DMXSPEED, DMXFORMAT, receivePin, sendPin);
+  
   dmxStarted = true;
 }
 
@@ -74,12 +78,15 @@ void DMXESPSerial::write(int Channel, uint8_t value) {
   if (value > 255) value = 255;
 
   dmxData[Channel] = value;
+ // Serial.println(DMXSerial.isTxEnabled());
+ // Serial.printf("channel %i value %i\n", Channel, value);
 }
 
 void DMXESPSerial::end() {
-  delete dmxData;
+  //delete dmxData;
+  dmxData[dmxMaxChannel] = {};
   chanSize = 0;
-  Serial1.end();
+  DMXSerial.end();
   dmxStarted == false;
 }
 
@@ -88,19 +95,19 @@ void DMXESPSerial::update() {
 
   //Send break
   digitalWrite(sendPin, HIGH);
-  Serial1.begin(BREAKSPEED, BREAKFORMAT);
-  Serial1.write(0);
-  Serial1.flush();
+  DMXSerial.begin(BREAKSPEED, BREAKFORMAT, receivePin, sendPin);
+  DMXSerial.write(0);
+  DMXSerial.flush();
   delay(1);
-  Serial1.end();
+  DMXSerial.end();
 
   //send data
-  Serial1.begin(DMXSPEED, DMXFORMAT);
+  DMXSerial.begin(DMXSPEED, DMXFORMAT, receivePin, sendPin);
   digitalWrite(sendPin, LOW);
-  Serial1.write(dmxData, chanSize);
-  Serial1.flush();
+  DMXSerial.write(dmxData, chanSize);
+  DMXSerial.flush();
   delay(1);
-  Serial1.end();
+  DMXSerial.end();
 }
 
 // Function to update the DMX bus

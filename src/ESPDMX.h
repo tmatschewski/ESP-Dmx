@@ -11,7 +11,7 @@
 // - - - - -
 
 #include <inttypes.h>
-
+//#include "ESPDMX.cpp"
 
 #ifndef ESPDMX_h
 #define ESPDMX_h
@@ -21,7 +21,7 @@
 class DMXESPSerial {
 public:
   void init();
-  void init(int MaxChan);
+  void init(int MaxChan, int dmxPin);
   uint8_t read(int Channel);
   void write(int channel, uint8_t value);
   void update();

@@ -2,11 +2,22 @@
     "name": "ESPDMX",
     "keywords": "DMX, controller, remote",
     "description": "Control DMX lights with an ESP8266",
+	"authors": [
+	        {
+            "name": "Thomas Matschewski",
+            "url": "https://github.com/tmatschewski",
+            "maintainer": true
+        }
+	],
     "repository":
     {
         "type": "git",
-        "url": "https://github.com/Rickgg/ESP-Dmx"
+        "url": "https://github.com/tmatschewski/ESP-Dmx"
     },
+	"homepage": "https://github.com/tmatschewski/ESP-Dmx",
+	"headers": "ESPDMX.h",
     "frameworks": "arduino",
-    "platforms": "espressif"
+    "platforms": "espressif",
+	"version": "1.0.1",
+	"license": "MIT",
 }
