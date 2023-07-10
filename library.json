@@ -17,7 +17,7 @@
 	"homepage": "https://github.com/tmatschewski/ESP-Dmx",
 	"headers": "ESPDMX.h",
     "frameworks": "arduino",
-    "platforms": "espressif",
+    "platforms": "espressif32",
 	"version": "1.0.1",
 	"license": "MIT",
 }
